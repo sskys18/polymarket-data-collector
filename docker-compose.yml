@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: polymarket_postgres
+    environment:
+      POSTGRES_USER: polymarket
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-dbtjd18!}
+      POSTGRES_DB: polymarket_data
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U polymarket"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  collector:
+    build: .
+    container_name: polymarket_collector
+    environment:
+      DATABASE_URL: postgresql://polymarket:${DATABASE_PASSWORD:-dbtjd18!}@postgres:5432/polymarket_data
+      COLLECTION_INTERVAL_SECONDS: ${COLLECTION_INTERVAL_SECONDS:-60}
+      BATCH_SIZE: ${BATCH_SIZE:-100}
+      MAX_CONCURRENT_REQUESTS: ${MAX_CONCURRENT_REQUESTS:-10}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

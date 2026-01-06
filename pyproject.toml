@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "polymarket-data-collector"
+version = "0.1.0"
+description = "Collect and store Polymarket market data"
+requires-python = ">=3.9"
+dependencies = [
+    "exchange-adapters[polymarket] @ git+https://github.com/sskys18/exchange-adapter.git",
+    "sqlalchemy[asyncio]>=2.0",
+    "asyncpg>=0.29.0",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "alembic>=1.12.0",
+]
+
+[tool.setuptools]
+packages = ["src", "src.collectors"]
+package-dir = {"" = "."}
+
+[tool.setuptools.package-data]
+src = ["py.typed"]
